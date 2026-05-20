@@ -1,0 +1,36 @@
+{
+  "network": "sepolia",
+  "safeAddress": "0x0000000000000000000000000000000000000000",
+  "agentAddress": "0x0000000000000000000000000000000000000000",
+  "token": {
+    "symbol": "USDC_TEST",
+    "address": "0x0000000000000000000000000000000000000000",
+    "decimals": 6
+  },
+  "policy": {
+    "expiresAt": "2026-05-21T00:00:00+08:00",
+    "maxPerTx": "1.0",
+    "maxDaily": "5.0",
+    "allowedRecipients": [
+      "0x0000000000000000000000000000000000000000"
+    ],
+    "allowedMethods": [
+      "transfer"
+    ],
+    "deny": [
+      "approve_unlimited",
+      "transfer_to_unlisted_address",
+      "setApprovalForAll",
+      "contract_upgrade"
+    ],
+    "onViolation": "reject"
+  },
+  "simulation": {
+    "enabled": true,
+    "requireHumanReadableSummary": true
+  },
+  "logging": {
+    "path": "experiments/agent-wallet/logs/",
+    "format": "jsonl"
+  }
+}
