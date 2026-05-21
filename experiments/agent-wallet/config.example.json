@@ -1,22 +1,22 @@
 {
   "network": "sepolia",
+  "chainId": 11155111,
   "safeAddress": "0x0000000000000000000000000000000000000000",
   "agentAddress": "0x0000000000000000000000000000000000000000",
+  "moduleAddress": "0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134",
   "token": {
-    "symbol": "USDC_TEST",
-    "address": "0x0000000000000000000000000000000000000000",
+    "symbol": "USDC",
+    "address": "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
     "decimals": 6
   },
   "policy": {
-    "expiresAt": "2026-05-21T00:00:00+08:00",
+    "expiresAt": "2026-06-20T00:00:00+08:00",
     "maxPerTx": "1.0",
     "maxDaily": "5.0",
     "allowedRecipients": [
       "0x0000000000000000000000000000000000000000"
     ],
-    "allowedMethods": [
-      "transfer"
-    ],
+    "allowedMethods": ["transfer"],
     "deny": [
       "approve_unlimited",
       "transfer_to_unlisted_address",
@@ -30,7 +30,7 @@
     "requireHumanReadableSummary": true
   },
   "logging": {
-    "path": "experiments/agent-wallet/logs/",
+    "path": "logs/audit.jsonl",
     "format": "jsonl"
   }
 }

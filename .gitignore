@@ -1,1 +1,5 @@
 .env
+experiments/agent-wallet/.env
+experiments/agent-wallet/config.json
+experiments/agent-wallet/logs/audit.jsonl
+experiments/agent-wallet/node_modules/

@@ -1,0 +1,16 @@
+{
+  "name": "agentscoope-wallet",
+  "version": "0.1.0",
+  "description": "AgentScoope Wallet — Safe Allowance Module demo on Sepolia",
+  "type": "module",
+  "scripts": {
+    "setup:info": "tsx src/scripts/print-setup-info.ts",
+    "pay": "tsx src/cli.ts pay",
+    "demo": "tsx src/cli.ts demo",
+    "demo:success": "tsx src/cli.ts demo success",
+    "demo:over-limit": "tsx src/cli.ts demo over-limit",
+    "demo:not-whitelisted": "tsx src/cli.ts demo not-whitelisted",
+    "demo:after-revoke": "tsx src/cli.ts demo after-revoke"
+  },
+  "license": "MIT"
+}
