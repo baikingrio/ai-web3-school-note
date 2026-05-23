@@ -2,23 +2,25 @@ import type { Address } from 'viem'
 import { loadAppConfig, loadEnv, resolveLogPath } from './config.js'
 import { baseAudit, writeAudit } from './audit.js'
 import {
-  executeAllowanceTransfer,
+  executeRolesTransfer,
   extractRevertDetail,
-  mapChainError,
-} from './allowance.js'
-import { checkPolicy } from './policy.js'
-import type { AppConfig, AuditEntry, TransferRequest } from './types.js'
+  mapRolesError,
+} from './roles.js'
+import { checkPolicy, type PolicyOptions } from './policy.js'
+import type { AppConfig, AuditEntry, PolicyEnforcement, TransferRequest } from './types.js'
 
 export interface PayOptions {
   broadcast: boolean
   scenario: string
-  /** Skip app maxPerTx / maxDaily — demo_over_limit hits chain allowance */
   enforceLimits?: boolean
+  enforcement?: PolicyEnforcement
+  skipAppWhitelist?: boolean
 }
 
 export interface PayOutcome {
   decision: AuditEntry['decision']
   reason?: string
+  rejectLayer?: AuditEntry['rejectLayer']
   simulationSummary?: string
   txHash?: AuditEntry['txHash']
 }
@@ -32,29 +34,36 @@ export async function runPay(
 
   const policy = checkPolicy(app, req, {
     enforceLimits: options.enforceLimits,
+    enforcement: options.enforcement,
+    skipAppWhitelist: options.skipAppWhitelist,
   })
   if (!policy.ok) {
     const entry = baseAudit(options.scenario, {
       decision: 'rejected',
       reason: policy.reason,
+      rejectLayer: policy.layer ?? 'app_policy',
       to: req.to,
       amount: req.amount,
       safeAddress: app.safeAddress,
       agentAddress: app.agentAddress,
     })
     writeAudit(logPath, entry)
-    console.log(`[reject] ${policy.reason}`)
-    return { decision: 'rejected', reason: policy.reason }
+    console.log(`[reject] ${policy.reason} (layer: ${policy.layer ?? 'app_policy'})`)
+    return {
+      decision: 'rejected',
+      reason: policy.reason,
+      rejectLayer: policy.layer,
+    }
   }
 
   if (!app.simulation.enabled) {
-    throw new Error('Simulation must be enabled for v0.1')
+    throw new Error('Simulation must be enabled')
   }
 
   const env = loadEnv()
 
   try {
-    const result = await executeAllowanceTransfer(
+    const result = await executeRolesTransfer(
       app,
       env,
       { to: req.to, amountHuman: req.amount },
@@ -82,11 +91,12 @@ export async function runPay(
       txHash: result.txHash,
     }
   } catch (err) {
-    const reason = mapChainError(err)
+    const { reason, layer } = mapRolesError(err)
     const revertDetail = extractRevertDetail(err)
     const entry = baseAudit(options.scenario, {
       decision: 'rejected',
       reason,
+      rejectLayer: layer,
       simulationSummary: revertDetail,
       to: req.to,
       amount: req.amount,
@@ -94,8 +104,8 @@ export async function runPay(
       agentAddress: app.agentAddress,
     })
     writeAudit(logPath, entry)
-    console.error(`[reject] ${reason}${revertDetail ? `: ${revertDetail}` : ''}`)
-    return { decision: 'rejected', reason }
+    console.error(`[reject] ${reason} (layer: ${layer})${revertDetail ? `: ${revertDetail}` : ''}`)
+    return { decision: 'rejected', reason, rejectLayer: layer }
   }
 }
 

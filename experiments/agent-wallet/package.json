@@ -1,16 +1,39 @@
 {
   "name": "agentscoope-wallet",
-  "version": "0.1.0",
-  "description": "AgentScoope Wallet — Safe Allowance Module demo on Sepolia",
+  "version": "0.3.0",
+  "description": "AgentScoope Wallet — Zodiac Roles Modifier demo on Sepolia",
   "type": "module",
   "scripts": {
     "setup:info": "tsx src/scripts/print-setup-info.ts",
+    "roles:setup": "eth-sdk && node scripts/sync-eth-sdk-client.mjs",
+    "preroles:plan": "npm run roles:setup",
+    "roles:plan": "tsx src/scripts/plan-apply-role.ts",
+    "roles:apply": "tsx src/scripts/apply-role-onchain.ts",
+    "roles:revoke": "tsx src/scripts/revoke-role-member.ts",
     "pay": "tsx src/cli.ts pay",
     "demo": "tsx src/cli.ts demo",
     "demo:success": "tsx src/cli.ts demo success",
     "demo:over-limit": "tsx src/cli.ts demo over-limit",
     "demo:not-whitelisted": "tsx src/cli.ts demo not-whitelisted",
-    "demo:after-revoke": "tsx src/cli.ts demo after-revoke"
+    "demo:after-revoke": "tsx src/cli.ts demo after-revoke",
+    "demo:roles-only": "tsx src/cli.ts demo roles-only",
+    "guard:test": "cd contracts && forge test",
+    "guard:deploy": "cd contracts && forge script script/DeployGuard.s.sol --rpc-url $SEPOLIA_RPC_URL --broadcast",
+    "guard:set-module": "tsx src/scripts/set-module-guard.ts"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@gnosis-guild/eth-sdk": "^0.4.0",
+    "@gnosis-guild/eth-sdk-client": "^0.1.6",
+    "dotenv": "^16.6.1",
+    "viem": "^2.37.12",
+    "zod": "^3.25.76",
+    "zodiac-roles-sdk": "^3.4.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.8",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
 }

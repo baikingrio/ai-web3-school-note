@@ -14,10 +14,11 @@ function usage(): never {
 AgentScoope Wallet CLI
 
   npm run pay -- --to <address> --amount <human> [--dry]
-  npm run demo -- <success|over-limit|not-whitelisted|after-revoke> [--dry]
+  npm run demo -- <success|over-limit|not-whitelisted|after-revoke|roles-only> [--dry]
 
 Examples:
   npm run demo:success
+  npm run demo:roles-only
   npm run pay -- --to 0x... --amount 0.5
 `)
   process.exit(1)
@@ -90,9 +91,27 @@ async function main() {
           { broadcast: false, scenario: 'demo_not_whitelisted' },
         )
         break
+      case 'roles-only':
+        console.log(
+          '[info] skipAppWhitelist=true — expect zodiac_roles reject on simulate',
+        )
+        await runPay(
+          {
+            to: DEMO_NOT_WHITELISTED_TO,
+            amount: DEMO_SUCCESS_AMOUNT,
+            method: 'transfer',
+            scenario: 'demo_roles_only',
+          },
+          {
+            broadcast: false,
+            scenario: 'demo_roles_only',
+            skipAppWhitelist: true,
+          },
+        )
+        break
       case 'after-revoke':
         console.log(
-          '[info] Ensure delegate was removed in Safe UI before this demo.',
+          '[info] Remove agent from role (npm run roles:plan with empty members) before this demo.',
         )
         await runPay(
           {

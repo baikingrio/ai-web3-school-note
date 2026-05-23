@@ -1,19 +1,30 @@
 import type { Address, Hash } from 'viem'
 
 export type Decision = 'executed' | 'rejected' | 'simulated'
+export type PolicyEnforcement = 'app' | 'both'
+export type ExecutionPath = 'zodiac_roles'
+export type RejectLayer =
+  | 'app_policy'
+  | 'zodiac_roles'
+  | 'module_guard'
+  | 'allowance_module'
+  | 'unknown'
 
 export interface AppConfig {
   network: string
   chainId: number
+  executionPath: ExecutionPath
   safeAddress: Address
   agentAddress: Address
-  moduleAddress: Address
+  rolesModAddress: Address
+  roleKey: string
   token: {
     symbol: string
     address: Address
     decimals: number
   }
   policy: {
+    enforcement: PolicyEnforcement
     expiresAt: string
     maxPerTx: string
     maxDaily: string
@@ -42,6 +53,7 @@ export interface TransferRequest {
 export interface PolicyResult {
   ok: boolean
   reason?: string
+  layer?: RejectLayer
 }
 
 export interface AuditEntry {
@@ -49,6 +61,7 @@ export interface AuditEntry {
   scenario: string
   decision: Decision
   reason?: string
+  rejectLayer?: RejectLayer
   to?: Address
   amount?: string
   simulationSummary?: string
@@ -61,12 +74,4 @@ export interface EnvConfig {
   rpcUrl: string
   agentPrivateKey: `0x${string}`
   dryRun: boolean
-}
-
-export interface AllowanceState {
-  amount: bigint
-  spent: bigint
-  resetTimeMin: bigint
-  lastResetMin: bigint
-  nonce: number
 }

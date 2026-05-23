@@ -2,7 +2,7 @@
 
 > 切入点：[Agent Wallet（智能体钱包）](https://aiweb3.school/zh/handbook/bridge/agent-wallet/)  
 > 学员：Quinn · AI 有基础 · Web3 熟悉 · 能独立开发 · 每日约 1 小时  
-> 状态：已确认 v0.2 · 2026-05-18
+> 状态：已确认 v0.3 Zodiac Roles · 2026-05-20
 
 ## 一句话
 
@@ -246,15 +246,32 @@ curl -sS -X POST "https://web3career.build/api/agent/call" \
 ## 开放问题
 
 1. **正式 Hackathon 题目/截止时间** — 需在 WCB Learning 登录后确认。  
-2. **具体用哪个 Safe 模块** — W1 D3 调研后写入 `experiments/agent-wallet/README.md`（Allowance / Zodiac Roles 等）。  
+2. ~~**具体用哪个 Safe 模块**~~ — **已决（v0.3）**：**Zodiac Roles Modifier** 完全替代 Allowance；链上白名单 + 单笔/日额度；`execTransactionWithRole`。Safe 1.4.1 可用。Allowance / Module Guard 移入 SETUP 附录。  
 3. **Agent 运行时** — Learning Agent 仅编排，还是接 Hermes / 自建 tool loop？
 
-## 下一步（建议本周）
+## v0.3 已完成（Zodiac Roles）
 
-1. 创建 `experiments/agent-wallet/`：README + `config.example.json`（Safe 地址、模块地址占位，无密钥）。  
-2. 在 Sepolia 创建 Safe，选定并启用一个现成 Module。  
-3. 完成第一笔额度内支付 + viem simulation 可读输出。  
-4. 记录模块选型理由与四条对比演示的计划。
+- 执行：`experiments/agent-wallet/src/roles.ts`（`rejectLayer: zodiac_roles`）  
+- 权限：`roles/agent_payer/` + `npm run roles:plan`  
+- 配置：`executionPath: zodiac_roles`，`rolesModAddress`，`roleKey`  
+- Demo：`demo:roles-only` 证明链上白名单；`demo:after-revoke` → `role_revoked`  
+- 文档：`experiments/agent-wallet/SETUP.md`（主路径）、README  
+
+## Proof-of-Work 补充（Roles）
+
+- [x] Roles 实例：`0x37C7b7437B6Bd27A15b330e6585940DEE03d2667`（Safe `0x6896…`）  
+- [x] Owner apply（`npm run roles:apply`）：[Call 1](https://sepolia.etherscan.io/tx/0xe4a8bc3354d7bd6de2f339450dfa78dd53aeb95a1180aad9b7118589cbbd4448) · [Call 2](https://sepolia.etherscan.io/tx/0x098b4f3c49797eed7d3525cc0f94e3ba14c0fb7ab7a9ddebaf4a0695e5d20460)  
+- [x] `demo:success`：[0x70583881…](https://sepolia.etherscan.io/tx/0x70583881b975348b89609459dba6e2ab7c5c21a59c647291a541cc36646914b5)  
+- [x] `demo:over-limit` / `demo:roles-only`：审计见 [`logs/pow-audit-v0.3.jsonl`](../experiments/agent-wallet/logs/pow-audit-v0.3.jsonl)（simulate，`zodiac_roles`）  
+- [x] `demo:not-whitelisted`：`app_policy`（同上 JSONL）  
+- [x] `demo:after-revoke`：`roles:revoke` [0xfb587c…](https://sepolia.etherscan.io/tx/0xfb587c9b4cfb54adb5534aaf1954de0b72e6bfd7e34f0d3cf45d23ed0c69a14c) → simulate `role_revoked` / `NoMembership()`；恢复 [0xa3e7d4…](https://sepolia.etherscan.io/tx/0xa3e7d41e341f2959376bace3b5d720e785693dbda8822153f401200867399cab)
+
+详见 `experiments/agent-wallet/README.md` § Demo 记录；审计 [`logs/pow-audit-v0.3.jsonl`](../experiments/agent-wallet/logs/pow-audit-v0.3.jsonl)（五条齐全）。
+
+## 下一步（建议）
+
+1. （可选）接 Hermes Tool Calling 包装 `npm run pay`。  
+2. WCB 提交 PoW 前由你确认字段与链接。
 
 ---
 

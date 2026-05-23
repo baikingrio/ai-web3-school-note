@@ -17,15 +17,18 @@ const address = z
 const ConfigSchema = z.object({
   network: z.string(),
   chainId: z.number(),
+  executionPath: z.literal('zodiac_roles').default('zodiac_roles'),
   safeAddress: address,
   agentAddress: address,
-  moduleAddress: address,
+  rolesModAddress: address,
+  roleKey: z.string().min(1),
   token: z.object({
     symbol: z.string(),
     address: address,
     decimals: z.number().int().positive(),
   }),
   policy: z.object({
+    enforcement: z.enum(['app', 'both']).default('both'),
     expiresAt: z.string(),
     maxPerTx: z.string(),
     maxDaily: z.string(),
@@ -46,9 +49,26 @@ const ConfigSchema = z.object({
 
 import type { EnvConfig } from './types.js'
 
-export function loadEnv(): EnvConfig {
+function loadDotenvFiles(): void {
   loadDotenv({ path: join(PACKAGE_ROOT, '.env') })
   loadDotenv({ path: join(PACKAGE_ROOT, '../../.env') })
+}
+
+export function loadOwnerEnv(): { rpcUrl: string; ownerPrivateKey: `0x${string}` } {
+  loadDotenvFiles()
+  const rpcUrl = process.env.SEPOLIA_RPC_URL
+  const ownerPrivateKey = process.env.OWNER_PRIVATE_KEY as `0x${string}` | undefined
+  if (!rpcUrl) {
+    throw new Error('Missing SEPOLIA_RPC_URL in .env')
+  }
+  if (!ownerPrivateKey || ownerPrivateKey === '0x') {
+    throw new Error('Missing OWNER_PRIVATE_KEY in .env (Safe owner, testnet only)')
+  }
+  return { rpcUrl, ownerPrivateKey }
+}
+
+export function loadEnv(): EnvConfig {
+  loadDotenvFiles()
 
   const rpcUrl = process.env.SEPOLIA_RPC_URL
   const agentPrivateKey = process.env.AGENT_PRIVATE_KEY as `0x${string}` | undefined
@@ -79,7 +99,19 @@ export function loadAppConfig(): AppConfig {
   }
 
   const raw = JSON.parse(readFileSync(path, 'utf-8'))
-  return ConfigSchema.parse(raw) as AppConfig
+  const parsed = ConfigSchema.parse(raw) as AppConfig
+
+  if (parsed.rolesModAddress === '0x0000000000000000000000000000000000000000') {
+    throw new Error(
+      'rolesModAddress must be your per-Safe Roles Modifier instance. Deploy via https://roles.gnosisguild.org (not the global factory 0x9646…).',
+    )
+  }
+
+  if (parsed.executionPath !== 'zodiac_roles') {
+    throw new Error('executionPath must be "zodiac_roles"')
+  }
+
+  return parsed
 }
 
 export function resolveLogPath(app: AppConfig): string {

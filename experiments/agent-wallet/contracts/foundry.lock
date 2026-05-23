@@ -1,0 +1,8 @@
+{
+  "lib/safe-smart-account": {
+    "branch": {
+      "name": "main",
+      "rev": "d7de455e0103bd3b6d1d6a4075d7c36d1869d677"
+    }
+  }
+}

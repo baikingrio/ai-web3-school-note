@@ -11,7 +11,8 @@ import {
 } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { sepolia } from 'viem/chains'
-import type { AppConfig, AllowanceState, EnvConfig } from './types.js'
+import type { AllowanceState, EnvConfig, RejectLayer } from './types.js'
+import type { AppConfig } from './types.js'
 import { fromTokenUnits, toTokenUnits } from './policy.js'
 
 export function getModuleDeployment(chainId: number) {
@@ -145,29 +146,60 @@ export async function executeAllowanceTransfer(
   return { txHash, simulationSummary, allowance }
 }
 
-/** Map viem/simulate revert to audit reason (avoid matching ABI param name "delegate"). */
-export function mapChainError(err: unknown): string {
+// cast sig "ErrorName()" — AgentScoopeModuleGuard custom errors
+const GUARD_ERROR_SELECTORS: Record<string, string> = {
+  d45f5e06: 'transfer_to_unlisted_address',
+  '9c5bebca': 'policy_expired',
+  '83f171d6': 'method_not_allowed',
+}
+
+/** Map viem/simulate revert to audit reason and layer. */
+export function mapChainError(err: unknown): { reason: string; layer: RejectLayer } {
   const msg = err instanceof Error ? err.message : String(err)
   const detailsMatch = msg.match(/Details:\s*([^\n]+)/i)
   const revertLine = detailsMatch?.[1] ?? msg
   const haystack = `${revertLine} ${msg}`.toLowerCase()
 
-  // Allowance module: spent would exceed configured cap
-  if (/newspent|new spent|exceed.*allowance|insufficient allowance/i.test(haystack)) {
-    return 'exceeds_allowance'
+  // Module Guard custom errors (human-readable revert data or error name)
+  if (
+    /transferto unlisted|transfer_to_unlisted|unlisted_address/i.test(haystack) ||
+    haystack.includes('transfer to unlisted')
+  ) {
+    return { reason: 'transfer_to_unlisted_address', layer: 'module_guard' }
   }
-  // Delegate actually removed or not authorized
+  if (/policyexpired|policy_expired/i.test(haystack)) {
+    return { reason: 'policy_expired', layer: 'module_guard' }
+  }
+  if (/methodnotallowed|method_not_allowed/i.test(haystack)) {
+    return { reason: 'method_not_allowed', layer: 'module_guard' }
+  }
+  if (/tokennotallowed|token_not_allowed/i.test(haystack)) {
+    return { reason: 'token_not_allowed', layer: 'module_guard' }
+  }
+  if (/onlyallowancemodule|only_allowance_module/i.test(haystack)) {
+    return { reason: 'only_allowance_module', layer: 'module_guard' }
+  }
+
+  for (const [sel, reason] of Object.entries(GUARD_ERROR_SELECTORS)) {
+    if (msg.includes(sel.slice(2))) {
+      return { reason, layer: 'module_guard' }
+    }
+  }
+
+  if (/newspent|new spent|exceed.*allowance|insufficient allowance/i.test(haystack)) {
+    return { reason: 'exceeds_allowance', layer: 'allowance_module' }
+  }
   if (
     /not a delegate|invalid delegate|delegate has been|delegate not|no delegate|delegates\[|is not an enabled delegate/i.test(
       haystack,
     )
   ) {
-    return 'delegate_revoked'
+    return { reason: 'delegate_revoked', layer: 'allowance_module' }
   }
   if (/allowance|insufficient/i.test(haystack)) {
-    return 'exceeds_allowance'
+    return { reason: 'exceeds_allowance', layer: 'allowance_module' }
   }
-  return 'chain_execution_failed'
+  return { reason: 'chain_execution_failed', layer: 'unknown' }
 }
 
 export function extractRevertDetail(err: unknown): string | undefined {
