@@ -22,7 +22,7 @@ This repository is public. Do **not** commit API keys, private keys, seed phrase
 - `experiments/`: technical experiments and prototypes
 - `handbook-feedback/`: feedback for Handbook pages
 - `hackathon/`: Hackathon ideas, plans, and project logs
-- `submissions/`: submitted links, screenshots, or public proof records
+- `submissions/`: submitted links, screenshots, or public proof records — **[Week 1 PoW Pack](./submissions/week1-pow-pack.md)**
 - `templates/`: reusable note templates
 
 ## Learning Principle

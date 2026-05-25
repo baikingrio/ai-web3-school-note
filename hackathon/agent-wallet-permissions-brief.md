@@ -187,12 +187,14 @@ session:
 
 提交 Hackathon / WCB 任务时可用的公开材料：
 
-- [ ] 本 brief 与架构图（本仓库 `hackathon/`）
-- [ ] `experiments/agent-wallet/` 代码与 README
-- [ ] 测试网合约地址 + Session 配置说明（**不含**私钥/助记词）
-- [ ] ≥4 笔代表性交易的区块浏览器链接
-- [ ] 审计日志样例（JSONL 或 markdown 表）
-- [ ] 1 页「Agent 不能做什么」边界说明
+- [x] 本 brief 与架构图（本仓库 `hackathon/`）
+- [x] `experiments/agent-wallet/` 代码与 README
+- [x] 测试网合约地址 + Session 配置说明（**不含**私钥/助记词）
+- [x] ≥4 笔代表性交易的区块浏览器链接
+- [x] 审计日志样例（JSONL 或 markdown 表）
+- [x] 1 页「Agent 不能做什么」边界说明 — 见 README § 安全边界
+
+**Week 1 Pack 总入口**：[`submissions/week1-pow-pack.md`](../submissions/week1-pow-pack.md)
 
 ## WCB Agent API 对齐
 
@@ -271,7 +273,7 @@ curl -sS -X POST "https://web3career.build/api/agent/call" \
 ## 下一步（建议）
 
 1. （可选）接 Hermes Tool Calling 包装 `npm run pay`。  
-2. WCB 提交 PoW 前由你确认字段与链接。
+2. Week 1 PoW 已在 WCB 通过；后续 Pack 更新见 [`submissions/week1-pow-pack.md`](../submissions/week1-pow-pack.md)。
 
 ---
 

@@ -59,6 +59,8 @@ Web3 里的交易不是普通 API 调用。一次链上操作通常意味着：
 
 ## 4. 本周 Proof-of-Work
 
+> **WCB Week 1 Pack 总入口**：[`submissions/week1-pow-pack.md`](../submissions/week1-pow-pack.md)
+
 ### 公开学习仓库
 
 https://github.com/baikingrio/ai-web3-school-note
