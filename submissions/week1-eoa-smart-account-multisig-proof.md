@@ -1,9 +1,4 @@
-# WCB 提交证明草稿：Week 1｜Web3 向进阶｜比较 EOA、智能账户、多签的权限差异
-
-- Task ID: `cmp9wlsoh0s4hmw01lck7hidd`
-- Task Title: `Week 1｜Web3 向进阶｜比较 EOA、智能账户、多签的权限差异`
-- Status checked: `NOT_STARTED`, `available=true`
-- Points: `30`
+# WCB 提交证明：Week 1｜Web3 向进阶｜比较 EOA、智能账户、多签的权限差异
 
 ## 建议提交证明
 
