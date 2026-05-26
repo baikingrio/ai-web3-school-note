@@ -6,7 +6,59 @@
 
 Agent Wallet 的核心不是“把主私钥交给 AI”，而是让 Agent 只能在可验证、可限制、可撤销的规则内行动。
 
-本实验服务于 AI × Web3 School Hackathon 项目：**AgentScoope Wallet**。
+本实验服务于 AI × Web3 School Hackathon 项目：**AgentScoope Wallet**（当前 `0.4.0`）。
+
+## v0.4 架构（Hermes + Tools + Human Check）
+
+```mermaid
+flowchart LR
+  Hermes[Hermes_Skill] --> ToolCLI["npm run tool"]
+  ToolCLI --> HumanCheck[human-check.ts]
+  HumanCheck --> DailyBudget[daily-budget.ts]
+  DailyBudget --> Policy[policy.ts]
+  Policy --> Pay[pay.ts]
+  Pay --> Roles[roles.ts]
+  Pay --> Audit[audit.jsonl]
+```
+
+| 层 | 组件 | 职责 |
+|----|------|------|
+| Agent 编排 | **Hermes** + [`hermes/SKILL.md`](./hermes/SKILL.md) | 自然语言 → shell 调用 tools |
+| 工具 | [`src/tools/run.ts`](./src/tools/run.ts) | JSON stdout：`get-policy` / `pay` / `simulate` |
+| Human Check | [`src/human-check.ts`](./src/human-check.ts) | L0 自动 / L1 `--confirm` / L2 拒绝 |
+| 日累计 | [`src/daily-budget.ts`](./src/daily-budget.ts) | 24h 滚动 `executed` 汇总 |
+| 链上 | **Zodiac Roles** + [`src/roles.ts`](./src/roles.ts) | 同 v0.3 |
+
+Hermes 安装与对话示例：**[HERMES.md](./HERMES.md)**。
+
+### Tools CLI
+
+```bash
+npm run tool -- get-policy
+npm run tool -- get-spending-status
+npm run tool -- get-balance
+npm run tool -- simulate --to 0x... --amount 0.5
+npm run tool -- pay --to 0x... --amount 0.5 [--confirm] [--dry]
+npm run demo:e2e          # 无 LLM 矩阵 demo
+npm test                  # daily-budget + human-check 单测
+```
+
+### Human Check（`config.json` → `humanCheck`）
+
+| 级别 | 条件 | broadcast 行为 |
+|------|------|----------------|
+| L0 | amount &lt; `confirmAboveAmount`（默认 0.8） | 自动 |
+| L1 | ≥ confirm 阈值 | 需 `--confirm` 或 `HUMAN_CONFIRM=1` |
+| L2 | ≥ `ownerSignatureAboveAmount`（默认 5.0） | `requires_owner_signature` |
+| L3 | Policy / Roles 越界 | 现有 reject |
+
+### v0.4 Demo 命令
+
+| 命令 | 预期 |
+|------|------|
+| `demo:daily-budget` | 若 24h 已用 +3 &gt; maxDaily → `exceeds_daily_budget` |
+| `demo:human-confirm` | `human_confirm_required`（无 `--confirm`） |
+| `demo:owner-required` | `requires_owner_signature` |
 
 ## v0.3 架构（Zodiac Roles）
 
@@ -83,6 +135,9 @@ npm run demo:roles-only   # 链上白名单拒绝（跳过 app 预检）
 | 3 | `demo:not-whitelisted` | `transfer_to_unlisted_address` | `app_policy`（`both`） |
 | 4 | `demo:roles-only` | `transfer_to_unlisted_address` | `zodiac_roles` |
 | 5 | `demo:after-revoke` | `role_revoked` | `zodiac_roles` |
+| 6 | `demo:daily-budget` | `exceeds_daily_budget`（audit 已用时） | `app_policy` |
+| 7 | `demo:human-confirm` | `human_confirm_required` | `app_policy` |
+| 8 | `demo:owner-required` | `requires_owner_signature` | `app_policy` |
 
 ## Demo 记录（Sepolia）
 
@@ -147,19 +202,23 @@ npm run demo:roles-only   # 链上白名单拒绝（跳过 app 预检）
 
 ```text
 experiments/agent-wallet/
-  eth-sdk/              # USDC ABI + allow kit
-  roles/agent_payer/    # members + permissions
-  contracts/            # Module Guard（Safe 1.5+ 备选，见 SETUP 附录 B）
-  src/roles.ts          # execTransactionWithRole
-  src/allowance.ts      # 旧路径，保留参考
+  hermes/               # Hermes SKILL + demo prompts
+  src/tools/            # JSON tools for Hermes
+  src/daily-budget.ts   # 24h rolling spend
+  src/human-check.ts    # L0–L2 gates
+  eth-sdk/
+  roles/agent_payer/
+  contracts/            # Module Guard（附录）
+  src/roles.ts
   logs/
   SETUP.md
+  HERMES.md
 ```
 
-## 后续
+## 后续（v0.5+）
 
-- Hermes / Tool Calling 编排 `npm run pay`
 - 多 token / 多方法扩展 `roles/agent_payer/permissions.ts`
+- 链上 Zodiac 日累计 allowance（需 license）
 
 ## 隐私提醒
 

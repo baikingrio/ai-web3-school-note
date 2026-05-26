@@ -22,7 +22,7 @@ This repository is public. Do **not** commit API keys, private keys, seed phrase
 - `experiments/`: technical experiments and prototypes
 - `handbook-feedback/`: feedback for Handbook pages
 - `hackathon/`: Hackathon ideas, plans, and project logs
-- `submissions/`: submitted links, screenshots, or public proof records — **[Week 1 PoW Pack](./submissions/week1-pow-pack.md)**
+- `submissions/`: submitted links — **[Week 1 PoW Pack](./submissions/week1-pow-pack.md)** · **[AgentScoope v0.4](./submissions/agent-wallet-v0.4.md)**
 - `templates/`: reusable note templates
 
 ## Learning Principle

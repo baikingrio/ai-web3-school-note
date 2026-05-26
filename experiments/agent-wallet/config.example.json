@@ -35,5 +35,9 @@
   "logging": {
     "path": "logs/audit.jsonl",
     "format": "jsonl"
+  },
+  "humanCheck": {
+    "confirmAboveAmount": "0.8",
+    "ownerSignatureAboveAmount": "5.0"
   }
 }

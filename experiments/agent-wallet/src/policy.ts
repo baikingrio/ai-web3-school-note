@@ -1,4 +1,6 @@
 import { getAddress, isAddress } from 'viem'
+import { checkDailyBudget } from './daily-budget.js'
+import { resolveLogPath } from './config.js'
 import type { AppConfig, PolicyEnforcement, PolicyResult, RejectLayer, TransferRequest } from './types.js'
 
 function parseUsdAmount(value: string): number {
@@ -89,13 +91,14 @@ export function checkPolicy(
 
   if (enforceLimits) {
     const maxPerTx = parseUsdAmount(app.policy.maxPerTx)
-    const maxDaily = parseUsdAmount(app.policy.maxDaily)
 
     if (amountNum > maxPerTx) {
       return { ok: false, reason: 'exceeds_max_per_tx', layer: 'app_policy' }
     }
-    if (amountNum > maxDaily) {
-      return { ok: false, reason: 'exceeds_max_daily', layer: 'app_policy' }
+
+    const daily = checkDailyBudget(app, req.amount, resolveLogPath(app))
+    if (!daily.ok) {
+      return { ok: false, reason: daily.reason, layer: 'app_policy' }
     }
   }
 
@@ -108,3 +111,12 @@ export const DEMO_OVER_LIMIT_AMOUNT = '2.0'
 /** Demo 3: non-whitelisted recipient */
 export const DEMO_NOT_WHITELISTED_TO =
   '0x000000000000000000000000000000000000dEaD' as const
+
+/** Demo: rolling 24h budget (use after prior executed spends in audit) */
+export const DEMO_DAILY_BUDGET_AMOUNT = '3.0'
+
+/** Demo: L1 human confirm without --confirm */
+export const DEMO_HUMAN_CONFIRM_AMOUNT = '0.9'
+
+/** Demo: L2 owner signature required */
+export const DEMO_OWNER_REQUIRED_AMOUNT = '6.0'

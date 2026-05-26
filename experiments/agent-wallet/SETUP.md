@@ -138,6 +138,18 @@ npm run roles:apply           # 恢复成员
 
 若跳过 `roles:revoke`，`demo:after-revoke` 仍会成功转账（误跑：[0x1469cea…](https://sepolia.etherscan.io/tx/0x1469cea977846893376ad3a1cd88ad27ad2bc5b5cbd6035408954a9c2910ef79)）。
 
+## 11. Hermes + v0.4 Tools（2026-05）
+
+```bash
+npm run tool -- get-policy
+npm run demo:e2e
+npm run demo:human-confirm
+npm run demo:daily-budget
+npm test
+```
+
+完整说明：**[HERMES.md](./HERMES.md)**。`config.json` 需包含 `humanCheck`（见 `config.example.json`）。
+
 ---
 
 ## 附录 A：旧路径 v0.1 Allowance Module

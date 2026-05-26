@@ -89,7 +89,7 @@ flowchart LR
 | 工作名 | **AgentScoope Wallet** |
 | 目标链 | **Sepolia** |
 | 实现路径 | **Safe + 现成模块**，优先快速出可演示 MVP |
-| Agent 运行时 | 待定（Learning Agent 编排 / Hermes / 自建 tool loop） |
+| Agent 运行时 | **Hermes** + `npm run tool` JSON CLI（v0.4） |
 
 ## 技术选型（已定）
 
@@ -249,7 +249,7 @@ curl -sS -X POST "https://web3career.build/api/agent/call" \
 
 1. **正式 Hackathon 题目/截止时间** — 需在 WCB Learning 登录后确认。  
 2. ~~**具体用哪个 Safe 模块**~~ — **已决（v0.3）**：**Zodiac Roles Modifier** 完全替代 Allowance；链上白名单 + 单笔/日额度；`execTransactionWithRole`。Safe 1.4.1 可用。Allowance / Module Guard 移入 SETUP 附录。  
-3. **Agent 运行时** — Learning Agent 仅编排，还是接 Hermes / 自建 tool loop？
+3. ~~**Agent 运行时**~~ — **已决（v0.4）**：**Hermes Skill** + [`experiments/agent-wallet/src/tools/`](../experiments/agent-wallet/src/tools/) → `runPay()`。
 
 ## v0.3 已完成（Zodiac Roles）
 
@@ -270,10 +270,18 @@ curl -sS -X POST "https://web3career.build/api/agent/call" \
 
 详见 `experiments/agent-wallet/README.md` § Demo 记录；审计 [`logs/pow-audit-v0.3.jsonl`](../experiments/agent-wallet/logs/pow-audit-v0.3.jsonl)（五条齐全）。
 
+## v0.4 已完成（Hermes + Tools）
+
+- Tools：`npm run tool -- get-policy | get-spending-status | simulate | pay`
+- Human Check：L0 / L1 `--confirm` / L2 `requires_owner_signature`
+- 24h 日累计：`src/daily-budget.ts` → `exceeds_daily_budget`
+- Hermes：[`hermes/SKILL.md`](../experiments/agent-wallet/hermes/SKILL.md)、[`HERMES.md`](../experiments/agent-wallet/HERMES.md)
+- Demo：`npm run demo:e2e`、v0.4 三条新 demo
+
 ## 下一步（建议）
 
-1. （可选）接 Hermes Tool Calling 包装 `npm run pay`。  
-2. Week 1 PoW 已在 WCB 通过；后续 Pack 更新见 [`submissions/week1-pow-pack.md`](../submissions/week1-pow-pack.md)。
+1. Hermes 对话录屏 + 更新 `logs/pow-audit-v0.4.jsonl` 实跑行。
+2. v0.5：多 token / 链上日累计 allowance。
 
 ---
 

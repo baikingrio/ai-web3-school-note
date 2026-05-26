@@ -45,6 +45,15 @@ const ConfigSchema = z.object({
     path: z.string(),
     format: z.literal('jsonl'),
   }),
+  humanCheck: z
+    .object({
+      confirmAboveAmount: z.string(),
+      ownerSignatureAboveAmount: z.string(),
+    })
+    .default({
+      confirmAboveAmount: '0.8',
+      ownerSignatureAboveAmount: '5.0',
+    }),
 })
 
 import type { EnvConfig } from './types.js'

@@ -1,7 +1,7 @@
 {
   "name": "agentscoope-wallet",
-  "version": "0.3.0",
-  "description": "AgentScoope Wallet — Zodiac Roles Modifier demo on Sepolia",
+  "version": "0.4.0",
+  "description": "AgentScoope Wallet — Zodiac Roles + Hermes tools on Sepolia",
   "type": "module",
   "scripts": {
     "setup:info": "tsx src/scripts/print-setup-info.ts",
@@ -11,12 +11,18 @@
     "roles:apply": "tsx src/scripts/apply-role-onchain.ts",
     "roles:revoke": "tsx src/scripts/revoke-role-member.ts",
     "pay": "tsx src/cli.ts pay",
+    "tool": "tsx src/tools/run.ts",
     "demo": "tsx src/cli.ts demo",
     "demo:success": "tsx src/cli.ts demo success",
     "demo:over-limit": "tsx src/cli.ts demo over-limit",
     "demo:not-whitelisted": "tsx src/cli.ts demo not-whitelisted",
     "demo:after-revoke": "tsx src/cli.ts demo after-revoke",
     "demo:roles-only": "tsx src/cli.ts demo roles-only",
+    "demo:daily-budget": "tsx src/cli.ts demo daily-budget",
+    "demo:human-confirm": "tsx src/cli.ts demo human-confirm",
+    "demo:owner-required": "tsx src/cli.ts demo owner-required",
+    "demo:e2e": "tsx src/scripts/demo-e2e.ts",
+    "test": "tsx --test src/**/*.test.ts",
     "guard:test": "cd contracts && forge test",
     "guard:deploy": "cd contracts && forge script script/DeployGuard.s.sol --rpc-url $SEPOLIA_RPC_URL --broadcast",
     "guard:set-module": "tsx src/scripts/set-module-guard.ts"

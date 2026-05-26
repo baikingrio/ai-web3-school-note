@@ -3,6 +3,13 @@ import type { Address, Hash } from 'viem'
 export type Decision = 'executed' | 'rejected' | 'simulated'
 export type PolicyEnforcement = 'app' | 'both'
 export type ExecutionPath = 'zodiac_roles'
+export type HumanCheckLevel = 'L0' | 'L1' | 'L2' | 'L3'
+
+export interface HumanCheckConfig {
+  confirmAboveAmount: string
+  ownerSignatureAboveAmount: string
+}
+
 export type RejectLayer =
   | 'app_policy'
   | 'zodiac_roles'
@@ -41,6 +48,7 @@ export interface AppConfig {
     path: string
     format: 'jsonl'
   }
+  humanCheck: HumanCheckConfig
 }
 
 export interface TransferRequest {
@@ -62,6 +70,7 @@ export interface AuditEntry {
   decision: Decision
   reason?: string
   rejectLayer?: RejectLayer
+  humanCheckLevel?: HumanCheckLevel
   to?: Address
   amount?: string
   simulationSummary?: string

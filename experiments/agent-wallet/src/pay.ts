@@ -7,6 +7,7 @@ import {
   mapRolesError,
 } from './roles.js'
 import { checkPolicy, type PolicyOptions } from './policy.js'
+import { checkHumanCheck } from './human-check.js'
 import type { AppConfig, AuditEntry, PolicyEnforcement, TransferRequest } from './types.js'
 
 export interface PayOptions {
@@ -15,14 +16,46 @@ export interface PayOptions {
   enforceLimits?: boolean
   enforcement?: PolicyEnforcement
   skipAppWhitelist?: boolean
+  humanConfirm?: boolean
 }
 
 export interface PayOutcome {
   decision: AuditEntry['decision']
   reason?: string
   rejectLayer?: AuditEntry['rejectLayer']
+  humanCheckLevel?: AuditEntry['humanCheckLevel']
   simulationSummary?: string
   txHash?: AuditEntry['txHash']
+}
+
+function rejectPay(
+  logPath: string,
+  scenario: string,
+  partial: {
+    reason: string
+    rejectLayer: AuditEntry['rejectLayer']
+    humanCheckLevel?: AuditEntry['humanCheckLevel']
+    to?: Address
+    amount?: string
+    safeAddress?: Address
+    agentAddress?: Address
+  },
+): PayOutcome {
+  const entry = baseAudit(scenario, {
+    decision: 'rejected',
+    ...partial,
+  })
+  writeAudit(logPath, entry)
+  console.log(
+    `[reject] ${partial.reason} (layer: ${partial.rejectLayer})` +
+      (partial.humanCheckLevel ? ` [${partial.humanCheckLevel}]` : ''),
+  )
+  return {
+    decision: 'rejected',
+    reason: partial.reason,
+    rejectLayer: partial.rejectLayer,
+    humanCheckLevel: partial.humanCheckLevel,
+  }
 }
 
 export async function runPay(
@@ -32,28 +65,37 @@ export async function runPay(
   const app = loadAppConfig()
   const logPath = resolveLogPath(app)
 
+  const human = checkHumanCheck(app, req, {
+    broadcast: options.broadcast,
+    humanConfirm: options.humanConfirm,
+  })
+  if (!human.ok) {
+    return rejectPay(logPath, options.scenario, {
+      reason: human.reason,
+      rejectLayer: 'app_policy',
+      humanCheckLevel: human.level,
+      to: req.to,
+      amount: req.amount,
+      safeAddress: app.safeAddress,
+      agentAddress: app.agentAddress,
+    })
+  }
+
   const policy = checkPolicy(app, req, {
     enforceLimits: options.enforceLimits,
     enforcement: options.enforcement,
     skipAppWhitelist: options.skipAppWhitelist,
   })
   if (!policy.ok) {
-    const entry = baseAudit(options.scenario, {
-      decision: 'rejected',
-      reason: policy.reason,
+    return rejectPay(logPath, options.scenario, {
+      reason: policy.reason!,
       rejectLayer: policy.layer ?? 'app_policy',
+      humanCheckLevel: human.level,
       to: req.to,
       amount: req.amount,
       safeAddress: app.safeAddress,
       agentAddress: app.agentAddress,
     })
-    writeAudit(logPath, entry)
-    console.log(`[reject] ${policy.reason} (layer: ${policy.layer ?? 'app_policy'})`)
-    return {
-      decision: 'rejected',
-      reason: policy.reason,
-      rejectLayer: policy.layer,
-    }
   }
 
   if (!app.simulation.enabled) {
@@ -73,6 +115,7 @@ export async function runPay(
     const decision = options.broadcast && !env.dryRun ? 'executed' : 'simulated'
     const entry = baseAudit(options.scenario, {
       decision,
+      humanCheckLevel: human.level,
       to: req.to,
       amount: req.amount,
       simulationSummary: result.simulationSummary,
@@ -87,6 +130,7 @@ export async function runPay(
     }
     return {
       decision,
+      humanCheckLevel: human.level,
       simulationSummary: result.simulationSummary,
       txHash: result.txHash,
     }
@@ -97,6 +141,7 @@ export async function runPay(
       decision: 'rejected',
       reason,
       rejectLayer: layer,
+      humanCheckLevel: human.level,
       simulationSummary: revertDetail,
       to: req.to,
       amount: req.amount,
@@ -105,7 +150,12 @@ export async function runPay(
     })
     writeAudit(logPath, entry)
     console.error(`[reject] ${reason} (layer: ${layer})${revertDetail ? `: ${revertDetail}` : ''}`)
-    return { decision: 'rejected', reason, rejectLayer: layer }
+    return {
+      decision: 'rejected',
+      reason,
+      rejectLayer: layer,
+      humanCheckLevel: human.level,
+    }
   }
 }
 
