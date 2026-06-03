@@ -1,0 +1,22 @@
+{
+  "name": "caw-sdk-minimal",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Minimal Cobo Agentic Wallet SDK exploration for PactTrader / AI Web3 School.",
+  "type": "module",
+  "scripts": {
+    "dry-run": "tsx src/caw-minimal.ts dry-run",
+    "inspect": "tsx src/caw-minimal.ts inspect",
+    "submit-pact": "tsx src/caw-minimal.ts submit-pact",
+    "transfer": "tsx src/caw-minimal.ts transfer"
+  },
+  "dependencies": {
+    "@cobo/agentic-wallet": "0.1.7",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

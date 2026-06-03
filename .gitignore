@@ -3,3 +3,5 @@ experiments/agent-wallet/.env
 experiments/agent-wallet/config.json
 experiments/agent-wallet/logs/audit.jsonl
 experiments/agent-wallet/node_modules/
+experiments/caw-sdk-minimal/.env
+experiments/caw-sdk-minimal/node_modules/
