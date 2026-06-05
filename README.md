@@ -27,15 +27,21 @@ This repository is public. Do **not** commit API keys, private keys, seed phrase
 
 ## Hackathon Project
 
-**AgentScoope Wallet** is the current Hackathon direction for AI × Web3 Agentic Builders Hackathon.
+**YieldAgent Collective / YieldAgent** is the current Hackathon mainline for AI × Web3 Agentic Builders Hackathon.
 
 - Main track: **Cobo 赛道｜Agentic Economy × Cobo Agentic Wallet**
-- Main direction: **Agent-Native Payments**
-- Demo scenario: **Agent Resource Procurement** — an AI Agent purchases whitelisted API / data / tool services within scoped budget and policy limits.
-- Core principle: **Agent recommends. Policy decides. Cobo executes only if allowed.**
-- Direction card: [`hackathon/week3-cobo-direction-card.md`](./hackathon/week3-cobo-direction-card.md)
-- Full brief: [`hackathon/agent-wallet-permissions-brief.md`](./hackathon/agent-wallet-permissions-brief.md)
-- Current fallback implementation: [`experiments/agent-wallet/`](./experiments/agent-wallet/)
+- Main direction: **Pact-first DeFi yield strategy agent console**
+- Demo scenario: **Bounded DeFi yield strategy** — the user defines max spend, allowed Recipes, network, duration, and revenue split through a Cobo CAW Pact; Strategy / Executor / Revenue agents can only operate inside those boundaries.
+- Core principle: **Pact before profit. Agent acts only inside user-approved CAW boundaries.**
+- Execution layer: **Cobo Agentic Wallet（CAW）/ Pact / Recipe**
+- Frontend stack: **Nuxt 4 / Nitro / Vue 3 / TypeScript / Tailwind CSS**
+- App state / validation: **Pinia / Zod**
+- Demo data: **Nitro mock API + fixtures**
+- Deployment target: **Vercel or Nuxt-compatible hosting**
+- Project repo: [`baikingrio/yield-agent`](https://github.com/baikingrio/yield-agent)
+- Direction card: [`hackathon/yield-agent-direction-card.md`](./hackathon/yield-agent-direction-card.md)
+- Ready pack: [`submissions/week3-yield-agent-ready-pack.md`](./submissions/week3-yield-agent-ready-pack.md)
+- Historical prior direction: PactTrader materials remain in `hackathon/` / `notes/` for learning history only; current Hackathon submissions should use YieldAgent unless explicitly stated otherwise.
 
 ## Learning Principle
 
