@@ -1,10 +1,10 @@
-# 2026-06-06｜PactTrader Demo 稳定性学习笔记
+# 2026-06-06｜YieldAgent Demo 稳定性学习笔记
 
 ## 1. 今天先解决的问题
 
-今天主要解决的是 PactTrader MVP 的一个现实问题：**Agentic Wallet demo 不能只在外部条件全部完美时才能跑通。**
+今天主要解决的是 YieldAgent MVP 的一个现实问题：**Agentic Wallet demo 不能只在外部条件全部完美时才能跑通。**
 
-PactTrader 的目标链路是：
+YieldAgent 的目标链路是：
 
 ```text
 User Strategy
@@ -28,7 +28,7 @@ User Strategy
 
 > 一个 Agentic Wallet demo 的可信度，不只来自成功执行交易，也来自它能清楚处理“不允许执行、权限不足、凭证缺失、只能 dry-run”这些状态。
 
-这和 PactTrader 的定位是一致的：
+这和 YieldAgent 的定位是一致的：
 
 > Agent proposes. Policy decides. CAW executes only when allowed.
 
@@ -90,7 +90,7 @@ API key pact authorization is not authorized for this wallet
 
 ### 4.2 今天的修正思路
 
-PactTrader 的策略创建可以分成两层：
+YieldAgent 的策略创建可以分成两层：
 
 1. **产品层策略 / Pact draft**：用户选择资产、风险等级、最大额度、分成等，生成本地策略记录。
 2. **Cobo Pact 真实提交**：把 Pact 提交到 CAW / Cobo 执行层。
@@ -199,12 +199,12 @@ GET /api/wallet
 今日提交：
 
 ```text
-18f9516 fix: keep PactTrader demo usable without full Cobo auth
+18f9516（demo fallback / Cobo auth 容错修复）
 ```
 
-## 7. 对 PactTrader Demo 的影响
+## 7. 对 YieldAgent Demo 的影响
 
-经过今天的修复，PactTrader 的 MVP 可以更稳定地展示下面几种状态：
+经过今天的修复，YieldAgent 的 MVP 可以更稳定地展示下面几种状态：
 
 ### 7.1 正常路径
 
@@ -245,7 +245,7 @@ caw node status
   -> remote 错误作为信息保留
 ```
 
-这些状态对 demo 很重要，因为它们能体现 PactTrader 不是一个“只有 happy path 的 AI 工具”，而是一个认真处理执行边界和失败状态的 Agentic Wallet 应用。
+这些状态对 demo 很重要，因为它们能体现 YieldAgent 不是一个“只有 happy path 的 AI 工具”，而是一个认真处理执行边界和失败状态的 Agentic Wallet 应用。
 
 ## 8. 后续开发任务拆解
 
@@ -261,19 +261,19 @@ caw node status
 
 1. 创建 / 导入 Agent Wallet；
 2. 设置小额 USDC 策略；
-3. 创建 PactTrader strategy；
+3. 创建 YieldAgent strategy；
 4. 展示 local risk decision；
 5. 展示 Cobo Pact / local draft 状态；
 6. 展示 audit log。
 
 ### Phase C：命名和 README 收敛
 
-当前代码仓库仍叫 `yield-agent`，但项目主线已经确认是 PactTrader。后续需要检查：
+当前代码仓库叫 `yield-agent`，这与项目主线 YieldAgent 一致。后续需要检查：
 
-- README 是否需要改成 PactTrader；
+- README 是否已经清楚表达 YieldAgent；
 - 页面标题是否统一；
-- package name / route / 文档是否仍残留 YieldAgent；
-- 迁移时注意不要误删历史 proof。
+- package name / route / 文档是否仍残留历史命名；
+- 清理历史命名时注意不要误删历史 proof。
 
 ### Phase D：真实 CAW / Z.AI 集成边界
 
@@ -284,7 +284,7 @@ caw node status
 
 ## 9. 今天的收获
 
-今天最大的收获是：PactTrader 的安全叙事不能只停留在“有 policy”。真正可信的 Agentic Wallet 产品，还要让用户和评委看见：
+今天最大的收获是：YieldAgent 的安全叙事不能只停留在“有 policy”。真正可信的 Agentic Wallet 产品，还要让用户和评委看见：
 
 1. 哪些动作被允许；
 2. 哪些动作被拒绝；
@@ -293,7 +293,7 @@ caw node status
 5. 哪些外部 API 不可用但产品仍能稳定展示；
 6. 每一步如何记录到 audit log。
 
-这也是我后续打磨 PactTrader demo 时要坚持的方向：**不夸大真实执行，不隐藏失败状态，把 Agent、Policy、CAW 和 Audit 的边界讲清楚。**
+这也是我后续打磨 YieldAgent demo 时要坚持的方向：**不夸大真实执行，不隐藏失败状态，把 Agent、Policy、CAW 和 Audit 的边界讲清楚。**
 
 ## 10. 隐私与公开边界
 
